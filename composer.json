@@ -1,0 +1,10 @@
+{
+    "name": "gecko/chatty",
+    "require": {
+        "guzzlehttp/guzzle": "^6.2",
+        "josegonzalez/dotenv": "^2.0"
+    },
+    "autoload": {
+      "classmap": ["includes/"]
+    }
+}
