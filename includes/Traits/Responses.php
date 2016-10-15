@@ -63,7 +63,12 @@ trait Responses
             'invatand alfabetul grecesc de pe borcanul de iaurt', 'rugandu-ma sa nu-l mai chinui', 'murind de foame',
             'alergandu-l pe fallen_angel sa-i fure bicicleta de $3k', 'ajungandu-l din urma pe wHoIS la saracie',
             'rezolvand challenge-uri mai repede ca Byte-ul', 'rugandu-l pe sandabot sa-i faca SEO la site-ul de avioane',
-            'scriind poezii despre shemale'];
+            'scriind poezii despre shemale', 'fasolar', 'frizer', 'parizar', 'salahor', 'cersetor', 'senator',
+            'pokemon', 'om matol', 'faggot', 'in dulap', 'pe chat (true AI)', 'verificand factura la curent', 'tatic',
+            'felinar', 'scarba', 'mai smecher decat __USER__', 'fericit', 'beat', 'mort in viata', 'sex symbol',
+            'vopsitor de camioane', 'glumeam, nu stiu cine e', 'kurd', 'kamikaze', 'terorist', 'faggot cu acte-n regula',
+
+        ];
 
         $this->respond(
             sprintf(
@@ -165,9 +170,47 @@ trait Responses
         }
     }
 
+    public function respondWithRandomOpinion()
+    {
+        $oppinions = [
+            'Esti un bagabont', 'Esti feroce', 'Esti praf', 'Esti degeaba', 'Esti un animal', 'Esti penal',
+            'Esti in plus', 'Esti si tu pe-aici', 'Esti dar mai bine nu erai', 'Esti in stare de orice', 'Esti',
+            'Erai bun, acum..', 'Esti prea sus, da-te jos de pe scaun', 'Esti la inaltime, ai invatat sa folosesti liftul',
+            'Esti prea smecher, mai lasai si pe restul', 'Esti cam nevoias', 'Esti'
+        ];
+
+        return $this->respond($oppinions[array_rand($oppinions)] . '.', false);
+    }
+
     public function respondWithIP($ip)
     {
         preg_match('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/i', $ip, $res);
         $this->respond(sprintf("root:root@%s:%d (UID: 0)", $res[1], rand(1, 65535)));
+    }
+
+    public function respondWithKick($user)
+    {
+        $this->kick($user);
+        return $this->respond('Done!');
+    }
+
+    public function respondToVotekick($user)
+    {
+        if (! isset($_SESSION['votekicks'][$user])) {
+            $_SESSION['votekicks'][$user] = [$this->author];
+        } elseif (! in_array($this->author, $_SESSION['votekicks'][$user])) {
+            $_SESSION['votekicks'][$user][] = $this->author;
+        }
+
+        $votes = count($_SESSION['votekicks'][$user]);
+
+        if ($votes >= 3) {
+            $_SESSION['votekicks'][$user] = [];
+            $this->kick($user);
+
+            return $this->respond("$user a primit kick de la prea multe voturi.");
+        }
+
+        return $this->respond("$user are $votes " . ($votes == 1 ? 'vot' : 'voturi') . " pentru a primi kick, la 3 va primi kick.");
     }
 }

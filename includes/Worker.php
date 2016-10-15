@@ -27,6 +27,7 @@ class Worker
 
     public function init()
     {
+        $_SESSION['votekicks'] = [];
         $this->login();
         $this->startCheckingMessages();
     }

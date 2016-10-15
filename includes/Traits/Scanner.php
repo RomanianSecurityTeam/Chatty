@@ -2,8 +2,6 @@
 
 namespace Chatty\Traits;
 
-use GuzzleHttp\Client;
-
 trait Scanner
 {
     public $BOT_PREFIX = '/ct|chatty';
@@ -123,11 +121,23 @@ trait Scanner
         elseif ($this->isPrefixed('giphy')) {
             $this->respondWithGiphyResult($this->getCommand('giphy'));
         }
+
+        elseif ($this->isPrefixed('.*?auzi ce (?:zice|spune) chatty')) {
+            $this->respondWithRandomOpinion();
+        }
+
+        elseif ($this->isAdmin() && $this->isPrefixed('kick')) {
+            $this->respondWithKick($this->getCommand('kick'));
+        }
+
+        elseif ($this->isPrefixed('votekick')) {
+            $this->respondToVotekick($this->getCommand('votekick'));
+        }
     }
 
     public function AI($message, $resultNumber = null)
     {
-        if (preg_match('#' . str_replace('#', '\#', $message) . '#i', $this->getCommand('chatty'), $result)) {
+        if (preg_match('#' . str_replace('#', '\#', $message) . '#i', $this->getCommand('chatty,?'), $result)) {
             return is_null($resultNumber) ? true : $result[$resultNumber];
         }
 
@@ -158,7 +168,7 @@ trait Scanner
         if ($this->AI('.*') && rand(0, 30) == 4) {
             $res = ['http://fbcdn-sphotos-e-a.hubatka.cz/hphotos-ak-prn1/44530_491807354174208_665546187_n.jpg?v324mn23f8v8s4n2nm3fs892mn2m34n289f7s98djk4n52k3j4h28w9f7smn2m3n42k3pf7sd9fwm', 'Mai lasa-ma c-am treaba.'];
 
-            $this->respond($res[rand(0, count($res) - 1)]);
+            $this->respond($res[rand(0, count($res) - 1)], false);
         }
 
         if ($this->AI('esti trist\?')) {
@@ -343,6 +353,13 @@ trait Scanner
             $this->respond(rand(1, 6) . '.');
         }
 
+        if (($bullets = $this->AI('(?:load|incarca) (un|one|doua|two|trei|three|patru|four|cinci|five|sase|six|[1-6]) (glonte?|gloante|bullets?) (si|and) (shoot|trage)', 1)) || ($bullets = $this->AI('(?:load|incarca) (si|and) (shoot|trage)', 1))) {
+            $this->loadBullets($bullets);
+            $this->russianRouletteShoot();
+        } elseif ($this->AI('trage')) {
+            $this->russianRouletteShoot();
+        }
+
         if ($this->AI('taci')) {
             $this->respond('Nu.');
         }
@@ -382,5 +399,49 @@ trait Scanner
 
             $this->respond(ucwords($res[rand(0, count($res) - 1)]) . '.');
         }
+    }
+
+    public function loadBullets($bullets)
+    {
+        switch ($bullets) {
+            case '1': case 'si': case 'un': case 'one':
+                $bullets = 1; break;
+            case '2': case 'doua': case 'two':
+                $bullets = 2; break;
+            case '3': case 'trei': case 'three':
+                $bullets = 3; break;
+            case '4': case 'patru': case 'four':
+                $bullets = 4; break;
+            case '5': case 'cinci': case 'five':
+                $bullets = 5; break;
+            case '6': case 'sase': case 'six':
+                $this->respond('Am 6 gloante incarcate. Am tras: Esti mort!');
+                $bullets = 6;
+        }
+
+        $_SESSION['loadedBullets'] = $bullets;
+        $_SESSION['barrellPosition'] = rand(0, 5);
+    }
+
+    public function russianRouletteShoot()
+    {
+        if (! isset($_SESSION['loadedBullets'])) {
+            $this->respond('Nu am pistolul incarcat. (Incearca: "chatty incarca si trage" sau "chatty incarca 2 gloante si trage")');
+            return;
+        }
+
+        $loadedBullets = $_SESSION['loadedBullets'];
+        $barrellPosition = &$_SESSION['barrellPosition'];
+
+        if ($shot = ($loadedBullets - 1 >= $barrellPosition++ % 6)) {
+            unset($_SESSION['loadedBullets']);
+        }
+
+        $result = $shot ? 'Esti mort' : 'Inca esti in viata';
+        $this->respond(
+            'Am ' . $loadedBullets . ' ' .
+            ($loadedBullets == 1 ? 'glont incarcat' : 'gloante incarcate') .
+            ". Am tras: $result!"
+        );
     }
 }

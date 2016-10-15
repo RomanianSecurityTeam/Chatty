@@ -50,14 +50,28 @@ trait Auth
         ];
     }
 
-    public function getUserList()
+    public function getUserList($getIds = false)
     {
-        $users = [];
-        $response = (new Client)->get('https://rstforums.com/forum/')->getBody()->getContents();
+        if (! $this->loggedClient) {
+            $this->login();
+        }
 
-        if (preg_match('#Who\'s Chatting.*?</ul>#si', $response, $html)) {
-            if (preg_match_all('#>([^<>]+)</(?:a|span)>#', $html[0], $result)) {
-                $users = array_values(array_diff($result[1], ['Chatty']));
+        $users = [];
+        $response = $this->loggedClient->get($this->chatURL)->getBody()->getContents();
+        $ignoreUsers = ['Chatty', 'Gecko'];
+
+        if (preg_match_all('#elChatUserRow_(\d+).*?<div class=\'cChatUsername\'>.*?\t(.*?) <#s', $response, $results)) {
+            if ($getIds) {
+                foreach ($results[1] as $i => $id) {
+                    $user = trim(strip_tags($results[2][$i]));
+                    if (! in_array($user, $ignoreUsers)) {
+                        $users[$user] = $id;
+                    }
+                }
+            } else {
+                $users = array_map(function ($user) {
+                    return trim(strip_tags($user));
+                }, array_values(array_diff($results[2], $ignoreUsers)));
             }
         }
 

@@ -84,6 +84,21 @@ class Message
         $callback($this, $response);
     }
 
+    public function kick($user)
+    {
+        $users = $this->getUserList(true);
+        if (! isset($users[$user])) {
+            return;
+        }
+
+        $this->worker->loggedClient->post(
+            'https://server10.ips-chat-service.com/moderate.php?' . http_build_query($this->chatApiGetData),
+            ['form_params' => ['against' => $users[$user]]]
+        );
+
+        $this->worker->answeredMessages[] = $this->message->timestamp . $this->message->author;
+    }
+
     public function parse()
     {
         if ($_SESSION['dontRespond']) {
@@ -91,8 +106,8 @@ class Message
         }
 
         $this->scanRandom();
-        $this->scanCommands();
         $this->scanAI();
+        $this->scanCommands();
 
         if ($this->worker->lastSentMessageTimestamp + 60 < time()) {
             $this->needsToRelogin = true;
