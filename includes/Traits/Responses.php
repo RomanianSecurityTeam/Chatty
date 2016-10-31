@@ -67,7 +67,6 @@ trait Responses
             'pokemon', 'om matol', 'faggot', 'in dulap', 'pe chat (true AI)', 'verificand factura la curent', 'tatic',
             'felinar', 'scarba', 'mai smecher decat __USER__', 'fericit', 'beat', 'mort in viata', 'sex symbol',
             'vopsitor de camioane', 'glumeam, nu stiu cine e', 'kurd', 'kamikaze', 'terorist', 'faggot cu acte-n regula',
-
         ];
 
         $this->respond(
@@ -196,6 +195,13 @@ trait Responses
 
     public function respondToVotekick($user)
     {
+        $untouchableUsers = ['Gecko', 'Chatty', 'aelius', 'Nytro', 'Zatarra', 'fallen_angel', 'wHoIS', 'urs',
+            'theandruala', 'badluck', 'Usr6'];
+
+        if (in_array($user, $untouchableUsers)) {
+            return null;
+        }
+
         if (! isset($_SESSION['votekicks'][$user])) {
             $_SESSION['votekicks'][$user] = [$this->author];
         } elseif (! in_array($this->author, $_SESSION['votekicks'][$user])) {

@@ -69,9 +69,9 @@ trait Auth
                     }
                 }
             } else {
-                $users = array_map(function ($user) {
+                $users = array_values(array_diff(array_map(function ($user) {
                     return trim(strip_tags($user));
-                }, array_values(array_diff($results[2], $ignoreUsers)));
+                }, $results[2]), $ignoreUsers));
             }
         }
 

@@ -52,9 +52,7 @@ class Message
         $prefix = $prefix ? "@$this->author: " : '';
 
         $this->postMessage("{$prefix}$response", function ($message, $response) {
-            echo "$message->author ($message->text): $response <br />\n";
-            ob_flush();
-            flush();
+            echo "$message->author ($message->text): $response" . PHP_EOL;
         });
     }
 

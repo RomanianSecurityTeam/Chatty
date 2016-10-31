@@ -36,7 +36,7 @@ trait Scanner
             $this->respond('https://az705183.vo.msecnd.net/onlinesupportmedia/onlinesupport/media/skype/screenshots/fa12330/emoticons/brb_80_anim_gif.gif', false);
         }
 
-        elseif (preg_match('/muie|pizda|futu-?ti|fmm|stf|sugi|pula|cur/i', $this->text)) {
+        elseif (preg_match('/\b(muie|pizda|futu-?ti|fmm|stf|sugi|pula|cur)\b/i', $this->text)) {
             $this->respond('https://az705183.vo.msecnd.net/onlinesupportmedia/onlinesupport/media/skype/screenshots/fa12330/emoticons/whistle_anim.gif', false);
         }
 
@@ -126,7 +126,7 @@ trait Scanner
             $this->respondWithRandomOpinion();
         }
 
-        elseif ($this->isAdmin() && $this->isPrefixed('kick')) {
+        elseif (($this->isAdmin() || $this->author == 'urs') && $this->isPrefixed('kick')) {
             $this->respondWithKick($this->getCommand('kick'));
         }
 
