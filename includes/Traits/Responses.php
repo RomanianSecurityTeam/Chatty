@@ -29,14 +29,14 @@ trait Responses
         $this->respond(
             sprintf(
                 'Am gasit-o pe %s %s, in %s cu urmatoarele calitati: %s si %s - %s, program: %s - %s, %s',
-                $firstnames[rand(0, count($firstnames) - 1)],
-                $lastnames[rand(0, count($lastnames) - 1)],
-                $places[rand(0, count($places) - 1)],
-                $features[rand(0, count($features) - 1)],
-                $features[rand(0, count($features) - 1)],
+                randarr($firstnames),
+                randarr($lastnames),
+                randarr($places),
+                randarr($features),
+                randarr($features),
                 '07' . rand(2, 9) . rand(0, 9) . ' ' . rand(100, 999) . ' ' . rand(100, 999),
-                $startDays[rand(0, count($startDays) - 1)],
-                $endDays[rand(0, count($endDays) - 1)],
+                randarr($startDays),
+                randarr($endDays),
                 '0' . rand(8, 9) . ':00 - ' . rand(20, 23) . ':00'
             )
         );
@@ -69,11 +69,21 @@ trait Responses
             'vopsitor de camioane', 'glumeam, nu stiu cine e', 'kurd', 'kamikaze', 'terorist', 'faggot cu acte-n regula',
         ];
 
-        $this->respond(
+        if (preg_match('/\bboloboc\b/', $this->text)) {
+            return $this->respond(
+                sprintf(
+                    'L-am gasit pe mov_0ah_01, %s - %s',
+                    str_replace('__USER__', randarr($users), randarr($jobs)),
+                    '07' . rand(2, 9) . rand(0, 9) . ' ' . rand(100, 999) . ' ' . rand(100, 999)
+                )
+            );
+        }
+
+        return $this->respond(
             sprintf(
                 'L-am gasit pe %s, %s - %s',
-                $users[rand(0, count($users) - 1)],
-                str_replace('__USER__', $users[rand(0, count($users) - 1)], $jobs[rand(0, count($jobs) - 1)]),
+                randarr($users),
+                str_replace('__USER__', randarr($users), randarr($jobs)),
                 '07' . rand(2, 9) . rand(0, 9) . ' ' . rand(100, 999) . ' ' . rand(100, 999)
             )
         );
@@ -86,7 +96,7 @@ trait Responses
             'http://api.icndb.com/jokes/random',
         ];
 
-        $api = rand(0, count($joke_apis) - 1);
+        $api = randarr($joke_apis);
         $joke = false;
 
         // Yo momma API
@@ -159,6 +169,14 @@ trait Responses
 
     public function respondWithGiphyResult($input)
     {
+        if (preg_match('/\bwhois\b/', $input)) {
+            $this->respond(randarr(['http://i.giphy.com/l2JhMHaI3tA3iZcPu.gif', 'http://www.business-netz.com/sites/default/files/bilder/kein_geld_0.jpg']), false);
+        }
+
+        elseif (preg_match('/\bsandabot\b/', $input)) {
+            $this->respond('https://i.imgur.com/GHpjA9o.png', false);
+        }
+
         $json = json_decode((new Client)->get('http://api.giphy.com/v1/gifs/search?q='
             . urlencode($input) . '&api_key=dc6zaTOxFJmzC')->getBody()->getContents());
 
@@ -196,7 +214,7 @@ trait Responses
     public function respondToVotekick($user)
     {
         $untouchableUsers = ['Gecko', 'Chatty', 'aelius', 'Nytro', 'Zatarra', 'fallen_angel', 'wHoIS', 'urs',
-            'theandruala', 'badluck', 'Usr6'];
+            'theandruala', 'badluck', 'Usr6', 'hades'];
 
         if (in_array($user, $untouchableUsers)) {
             return null;

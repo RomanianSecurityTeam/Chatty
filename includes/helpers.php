@@ -11,3 +11,7 @@ function preg_get($pattern, $string, $position = 1) {
 function env($key, $default = null) {
     return $_ENV[$key] ?: $default;
 }
+
+function randarr(array $arr) {
+	return $arr[rand(0, count($arr) - 1)];
+}

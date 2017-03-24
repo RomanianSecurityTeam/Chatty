@@ -58,7 +58,7 @@ trait Auth
 
         $users = [];
         $response = $this->loggedClient->get($this->chatURL)->getBody()->getContents();
-        $ignoreUsers = ['Chatty', 'Gecko'];
+        $ignoreUsers = ['Chatty'];
 
         if (preg_match_all('#elChatUserRow_(\d+).*?<div class=\'cChatUsername\'>.*?\t(.*?) <#s', $response, $results)) {
             if ($getIds) {
@@ -80,6 +80,6 @@ trait Auth
 
     public function isAdmin()
     {
-        return $this->author == 'Gecko';
+        return in_array($this->author, ['Gecko', 'aelius', 'tex']);
     }
 }
